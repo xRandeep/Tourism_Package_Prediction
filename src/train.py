@@ -3,7 +3,7 @@ import joblib
 import matplotlib.pyplot as plt
 import seaborn as sns
 from datasets import load_dataset
-from huggingface_hub import HfApi
+from huggingface_hub import HfApi, login
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from xgboost import XGBClassifier
 from sklearn.model_selection import GridSearchCV
@@ -17,7 +17,7 @@ MODEL_REPO = f"{HF_USERNAME}/tourism-prediction-model"
 
 def train_model():
     print("Loading processed data...")
-    dataset = load_dataset(DATASET_REPO)
+    dataset = load_dataset(DATASET_REPO, "processed")
     train_df = dataset['train'].to_pandas()
     test_df = dataset['test'].to_pandas()
 
