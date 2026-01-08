@@ -43,7 +43,7 @@ try:
             passport = st.selectbox("Has Passport?", [0, 1])
 
         submit = st.form_submit_button("Predict Probability")
-        
+		
 		if submit:
             # 1. Create DataFrame with user inputs (Order doesn't matter here yet)
             input_data = pd.DataFrame({
