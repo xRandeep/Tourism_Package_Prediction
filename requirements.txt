@@ -1,0 +1,10 @@
+pandas
+scikit-learn
+datasets
+huggingface_hub
+joblib
+xgboost
+streamlit
+matplotlib
+seaborn
+pytest
