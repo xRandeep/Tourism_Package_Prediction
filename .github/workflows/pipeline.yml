@@ -22,6 +22,12 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pandas scikit-learn datasets huggingface_hub joblib xgboost streamlit
+
+    - name: Register Raw Data
+      env:
+        HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      run: |
+        python src/register_data.py
         
     - name: Run Data Processing
       env:
