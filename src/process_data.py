@@ -11,7 +11,7 @@ def process_data():
     print("Loading data from Hugging Face...")
     # Load raw data (Assuming you uploaded it as 'raw' config or just the main dataset)
     # If this fails, ensure you ran the "Registration" step one-time script first
-    dataset = load_dataset(DATASET_REPO, split="train") 
+    dataset = load_dataset(DATASET_REPO, "raw") 
     df = dataset.to_pandas()
 
     print(f"   Original Shape: {df.shape}")
@@ -39,8 +39,9 @@ def process_data():
     print("Uploading processed splits to Hugging Face...")
     
     # Convert back to HF Dataset objects
-    train_dataset = Dataset.from_pandas(train_df)
-    test_dataset = Dataset.from_pandas(test_df)
+	# We reset the index to drop the shuffled index and prevent schema conflicts
+    train_dataset = Dataset.from_pandas(train_df.reset_index(drop=True))
+    test_dataset = Dataset.from_pandas(test_df.reset_index(drop=True))
 
     # Create a DatasetDict
     dd = DatasetDict({
