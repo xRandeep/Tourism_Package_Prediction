@@ -5,7 +5,7 @@ import os
 
 # Configuration
 HF_USERNAME = "iStillWaters"  # HuggingFace Profile
-DATASET_REPO = f"{HF_USERNAME}/tourism-project-data"
+DATASET_REPO = f"{HF_USERNAME}/tourism-package-data"
 
 def process_data():
     print("Loading data from Hugging Face...")
