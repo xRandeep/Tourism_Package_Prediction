@@ -1,0 +1,55 @@
+name: Tourism MLOps Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-train-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pandas scikit-learn datasets huggingface_hub joblib xgboost streamlit
+        
+    - name: Run Data Processing
+      env:
+        HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      run: |
+        python src/process_data.py
+        
+    - name: Train and Evaluate Model
+      env:
+        HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      run: |
+        python src/train.py
+        
+    - name: Build Docker Image (Test)
+      run: |
+        docker build . -t tourism-prediction:latest
+        
+    - name: Push to Hugging Face Spaces
+      env:
+        HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      run: |
+        # Configure Git to recognize the bot
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
+        
+        # Add Hugging Face Space as a remote repo
+        # REPLACE 'YOUR_USERNAME/SPACE_NAME' below!
+        git remote add space https://oauth2:$HF_TOKEN@huggingface.co/spaces/iStillWaters/tourism-prediction-app
+        
+        # Push code to Space to trigger deployment
+        git push space main:main --force
