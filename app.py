@@ -44,26 +44,47 @@ try:
 
         submit = st.form_submit_button("Predict Probability")
         
-        if submit:
-            # Create dataframe with inputs
-            # NOTE: In a real app, you MUST provide all columns used in training.
-            # Here we fill missing numerical columns with mean/mode defaults for the demo.
+if submit:
+            # 1. Create DataFrame with user inputs (Order doesn't matter here yet)
             input_data = pd.DataFrame({
-                'Age': [age], 'MonthlyIncome': [income], 'DurationOfPitch': [pitch_dur],
-                'Gender': [gender], 'MaritalStatus': [marital], 'TypeofContact': [contact],
-                'Occupation': [occupation], 'ProductPitched': [product], 'Designation': [designation],
+                'Age': [age], 
+                'MonthlyIncome': [income], 
+                'DurationOfPitch': [pitch_dur],
+                'Gender': [gender], 
+                'MaritalStatus': [marital], 
+                'TypeofContact': [contact],
+                'Occupation': [occupation], 
+                'ProductPitched': [product], 
+                'Designation': [designation],
                 'Passport': [passport],
                 # Defaults for columns not in form
-                'CityTier': [1], 'NumberOfPersonVisiting': [3], 'NumberOfFollowups': [3],
-                'PreferredPropertyStar': [3], 'NumberOfTrips': [3], 'PitchSatisfactionScore': [3],
-                'OwnCar': [1], 'NumberOfChildrenVisiting': [1] 
+                'CityTier': [1], 
+                'NumberOfPersonVisiting': [3], 
+                'NumberOfFollowups': [3],
+                'PreferredPropertyStar': [3], 
+                'NumberOfTrips': [3], 
+                'PitchSatisfactionScore': [3],
+                'OwnCar': [1], 
+                'NumberOfChildrenVisiting': [1] 
             })
             
-            # Encode categorical columns
+            # 2. Encode categorical columns
             for col, le in encoders.items():
-                input_data[col] = le.transform(input_data[col])
+                if col in input_data.columns:
+                    input_data[col] = le.transform(input_data[col])
             
-            # Predict
+            # --- THE FIX: Reorder columns to match training data exactly ---
+            expected_order = [
+                'Age', 'TypeofContact', 'CityTier', 'DurationOfPitch', 'Occupation', 
+                'Gender', 'NumberOfPersonVisiting', 'NumberOfFollowups', 'ProductPitched', 
+                'PreferredPropertyStar', 'MaritalStatus', 'NumberOfTrips', 'Passport', 
+                'PitchSatisfactionScore', 'OwnCar', 'NumberOfChildrenVisiting', 
+                'Designation', 'MonthlyIncome'
+            ]
+            input_data = input_data[expected_order]
+            # ---------------------------------------------------------------
+            
+            # 3. Predict
             pred = model.predict(input_data)[0]
             prob = model.predict_proba(input_data)[0][1]
             
@@ -71,6 +92,6 @@ try:
                 st.success(f"✅ Likely to Purchase! (Confidence: {prob:.1%})")
             else:
                 st.error(f"❌ Unlikely to Purchase. (Confidence: {prob:.1%})")
-
+				
 except Exception as e:
     st.error(f"Error loading model: {e}")
